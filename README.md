@@ -64,3 +64,41 @@ Identifiants : Génération automatique du SamAccountName (Initial prénom + Nom
 Profil complet : Remplissage des attributs AD (adresse, CP, ville, date d'embauche dans la description).
 
 Sécurité : Attribution d'un mot de passe temporaire avec obligation de changement à la première connexion.
+
+
+
+
+# 📜 VBScript AD-Automation : Provisioning d'Infrastructure
+
+Le script VBScript (`.vbs`) automatise la création de la structure Active Directory et de l'arborescence des fichiers à partir d'un fichier CSV. Il est idéal pour les environnements ne disposant pas de PowerShell ou pour les serveurs legacy.
+
+---
+
+## 📊 Workflow de l'automatisation (Mermaid)
+
+Le script utilise une approche séquentielle en appelant des commandes système pour interagir avec l'Active Directory.
+
+
+
+```mermaid
+graph TD
+    Start([Début du Script]) --> CSVCheck{Fichier CSV trouvé ?}
+    CSVCheck -- Non --> ErrorEnd[WScript.Echo : Introuvable]
+    CSVCheck -- Oui --> Loop[Lecture ligne par ligne]
+    
+    Loop --> EmptyCheck{Ligne vide ou Commentaire # ?}
+    EmptyCheck -- Oui --> Loop
+    EmptyCheck -- Non --> FieldCheck{Plus de 8 colonnes ?}
+    
+    FieldCheck -- Non --> Skip[WScript.Echo : Ligne invalide]
+    FieldCheck -- Oui --> Process[Traitement des 4 fonctions]
+    
+    Process --> OU[1. dsadd ou : Création OU Site & Service]
+    OU --> Groups[2. dsadd group : Création GG & GL + Imbrication]
+    Groups --> ServiceFolders[3. FSO : Création dossiers services]
+    ServiceFolders --> UserFolder[4. FSO : Création dossier perso format pre.nom]
+    
+    UserFolder --> Next[Ligne suivante...]
+    Next --> Loop
+    Loop --> End([Fin de traitement])
+```
